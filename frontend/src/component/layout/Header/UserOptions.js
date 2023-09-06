@@ -13,6 +13,7 @@ import { logout } from "../../../actions/userAction";
 import { useDispatch, useSelector } from "react-redux";
 
 const UserOptions = ({ user }) => {
+  console.log(user);
   const { cartItems } = useSelector((state) => state.cart);
 
   const [open, setOpen] = useState(false);
@@ -75,7 +76,7 @@ const UserOptions = ({ user }) => {
         icon={
           <img
             className="speedDialIcon"
-            src={user.avatar.url ? user.avatar.url : "/Profile.png"}
+            src={`data:${user.avatar.contentType};base64,${user.avatar.data}`}
             alt="Profile"
           />
         }

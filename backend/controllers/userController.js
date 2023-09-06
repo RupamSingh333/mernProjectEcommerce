@@ -5,32 +5,28 @@ const sendToken = require("../utils/jwtToken");
 const sendEmail = require("../utils/sendEmail");
 const crypto = require("crypto");
 // const cloudinary = require("cloudinary");
-const multer = require("multer");
 
-// Set up multer storage for file uploads
-const storage = multer.memoryStorage();
-const upload = multer({ storage: storage });
-
-// Register a User
+const fs = require("fs");
 exports.registerUser = catchAsyncErrors(async (req, res, next) => {
-  const { name, email, password } = req.body;
+  const { name, email, password, avatar } = req.body;
 
-  // Check if a file is uploaded
-  if (!req.files || !req.files.avatar) {
+  if (!avatar) {
     return next(new ErrorHander("Please upload an avatar image.", 400));
   }
 
-  const avatarData = req.files.avatar.data;
-  const avatarContentType = req.files.avatar.mimetype;
+  const avatarData = avatar.replace(/^data:image\/\w+;base64,/, "");
+  const avatarBuffer = Buffer.from(avatarData, "base64");
+
   const user = await User.create({
     name,
     email,
     password,
     avatar: {
-      data: avatarData, // Store the image buffer
-      contentType: avatarContentType, // Store the image content type
+      data: avatarBuffer,
+      contentType: "image/png",
     },
   });
+
   sendToken(user, 201, res);
 });
 
@@ -45,7 +41,8 @@ exports.loginUser = catchAsyncErrors(async (req, res, next) => {
   }
 
   const user = await User.findOne({ email }).select("+password");
-  // console.log(user);
+  // console.log(user, "from login");
+  // return false;
 
   if (!user) {
     return next(new ErrorHander("Invalid email or password", 401));
@@ -190,11 +187,25 @@ exports.resetPassword = catchAsyncErrors(async (req, res, next) => {
 // Get User Detail
 exports.getUserDetails = catchAsyncErrors(async (req, res, next) => {
   const user = await User.findById(req.user.id);
-
-  res.status(200).json({
-    success: true,
-    user,
-  });
+  if (user.avatar) {
+    const avatarBase64 = user.avatar.data.toString("base64");
+    res.status(200).json({
+      success: true,
+      user: {
+        ...user.toObject(),
+        avatar: {
+          contentType: user.avatar.contentType,
+          data: avatarBase64,
+        },
+      },
+    });
+  } else {
+    // If user does not have an avatar
+    res.status(200).json({
+      success: true,
+      user,
+    });
+  }
 });
 
 // update User password

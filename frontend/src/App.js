@@ -45,12 +45,11 @@ import NotFound from "./component/layout/Not Found/NotFound";
 
 function App() {
   const { isAuthenticated, user } = useSelector((state) => state.user);
-
+  // console.log(user);
   const [stripeApiKey, setStripeApiKey] = useState("");
 
   async function getStripeApiKey() {
     const { data } = await axios.get("/api/v1/stripeapikey");
-
     setStripeApiKey(data.stripeApiKey);
   }
 
@@ -71,9 +70,7 @@ function App() {
   return (
     <Router>
       <Header />
-
       {isAuthenticated && <UserOptions user={user} />}
-
       {stripeApiKey && (
         <Elements stripe={loadStripe(stripeApiKey)}>
           <ProtectedRoute exact path="/process/payment" component={Payment} />
@@ -85,17 +82,11 @@ function App() {
         <Route exact path="/product/:id" component={ProductDetails} />
         <Route exact path="/products" component={Products} />
         <Route path="/products/:keyword" component={Products} />
-
         <Route exact path="/search" component={Search} />
-
         <Route exact path="/contact" component={Contact} />
-
         <Route exact path="/about" component={About} />
-
         <ProtectedRoute exact path="/account" component={Profile} />
-
         <ProtectedRoute exact path="/me/update" component={UpdateProfile} />
-
         <ProtectedRoute
           exact
           path="/password/update"
@@ -103,23 +94,14 @@ function App() {
         />
 
         <Route exact path="/password/forgot" component={ForgotPassword} />
-
         <Route exact path="/password/reset/:token" component={ResetPassword} />
-
         <Route exact path="/login" component={LoginSignUp} />
-
         <Route exact path="/cart" component={Cart} />
-
         <ProtectedRoute exact path="/shipping" component={Shipping} />
-
         <ProtectedRoute exact path="/success" component={OrderSuccess} />
-
         <ProtectedRoute exact path="/orders" component={MyOrders} />
-
         <ProtectedRoute exact path="/order/confirm" component={ConfirmOrder} />
-
         <ProtectedRoute exact path="/order/:id" component={OrderDetails} />
-
         <ProtectedRoute
           isAdmin={true}
           exact

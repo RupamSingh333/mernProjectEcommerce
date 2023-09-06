@@ -13,6 +13,8 @@ const Profile = ({ history }) => {
       history.push("/login");
     }
   }, [history, isAuthenticated]);
+
+  // console.log(user);
   return (
     <Fragment>
       {loading ? (
@@ -23,7 +25,11 @@ const Profile = ({ history }) => {
           <div className="profileContainer">
             <div>
               <h1>My Profile</h1>
-              <img src={user.avatar.url} alt={user.name} />
+              <img
+                src={`data:${user.avatar.contentType};base64,${user.avatar.data}`}
+                alt={user.name}
+              />
+
               <Link to="/me/update">Edit Profile</Link>
             </div>
             <div>
